@@ -42,7 +42,7 @@ module.exports = {
             body: {
               prompt,
               n: 4,
-              size: '256x256'
+              size: '1024x1024'
             }
           });
           if (!result.data) {

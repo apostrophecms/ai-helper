@@ -64,7 +64,7 @@ export default {
     },
     async generate() {
       this.error = false;
-      this.images  = [];
+      this.images = [];
       try {
         const result = await self.apos.http.post(`${apos.image.action}/ai-helper-generate`, {
           body: {
@@ -79,7 +79,7 @@ export default {
     },
     async save(id) {
       try {
-        const image = self.apos.http.post(`${apos.image.action}/ai-helper-accept`, {
+        const image = await self.apos.http.post(`${apos.image.action}/ai-helper-accept`, {
           body: {
             id
           }
@@ -87,12 +87,10 @@ export default {
         console.log('posting the content changed event after successful accept');
         this.$emit('modal-result', image);
         this.modal.showModal = false;
-        // If I don't defer this the media manager does not refresh
-        this.$nextTick(() => {
-          apos.bus.$emit('content-changed', {
-            image,
-            action: 'insert'
-          });
+        apos.bus.$emit('content-changed', {
+          doc: image,
+          action: 'insert',
+          select: true
         });
       } catch (e) {
         this.error = true;
