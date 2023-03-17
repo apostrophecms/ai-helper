@@ -41,3 +41,9 @@ you wish.
 
 When you are happy with the results, click on the best of the four images to insert it
 into the media library and select it. Then save your selection as you normally would.
+
+## Notes
+
+The image helper generates 1024x1024 images. This is the maximum size supported by OpenAI.
+As of this writing, smaller images are not much cheaper, and are unlikely to look good
+in various placements on a website.

@@ -1,6 +1,10 @@
 const fetch = require('node-fetch');
 const cuid = require('cuid');
 const path = require('path');
+const FormData = require('form-data');
+const fs = require('fs');
+const writeFile = require('util').promisify(fs.writeFile);
+const unlink = require('util').promisify(require('fs').unlink);
 
 module.exports = {
   improve: '@apostrophecms/image',
@@ -10,13 +14,14 @@ module.exports = {
     }
   },
   icons: {
-    robot: 'Robot'
+    'robot-icon': 'Robot',
+    'group-icon': 'Group'
   },
   utilityOperations: {
     add: {
       aiInsertImage: {
         label: 'Generate an image with AI',
-        icon: 'robot',
+        icon: 'robot-icon',
         iconOnly: true,
         relationships: true,
         button: true,
@@ -26,63 +31,141 @@ module.exports = {
       }
     }
   },
+  async init(self) {
+    self.aiHelperImages = self.apos.db.collection('aposAiHelperImages');
+    await self.aiHelperImages.createIndex({
+      userId: 1,
+      createdAt: -1
+    });
+  },
+  methods(self) {
+    return {
+      async aiHelperFetchImage(_id, url) {
+        const response = await fetch(url);
+        const buffer = await response.buffer();
+        const temp = path.join(self.apos.rootDir, `data/temp/${_id}.png`);
+        await writeFile(temp, buffer);
+        return temp;
+      }
+    };
+  },
   apiRoutes(self) {
     return {
-      post: {
-        async aiHelperGenerate(req) {
-          const prompt = self.apos.launder.string(req.body.prompt);
-          if (!prompt.length) {
-            throw self.apos.error('invalid');
-          }
-          const result = await self.apos.http.post('https://api.openai.com/v1/images/generations', {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${process.env.OPENAI_KEY}`
-            },
-            body: {
-              prompt,
-              n: 4,
-              size: '1024x1024'
+      get: {
+        async 'ai-helper'(req) {
+          const images = await self.aiHelperImages.find({
+            userId: req.user._id,
+            createdAt: {
+              // OpenAI image URLs are only good for an hour
+              $gte: new Date(Date.now() - 1000 * 60 * 60)
             }
-          });
-          if (!result.data) {
-            throw self.apos.error('error');
-          }
-          const urls = result.data.map(item => item.url);
-          const images = [];
-          for (const url of urls) {
-            const id = cuid();
-            await self.apos.cache.set('aiHelperImage', id, {
-              url,
-              prompt
-            });
-            images.push({
-              id,
-              url,
-              prompt
-            });
-          }
+          }).sort({
+            createdAt: -1
+          }).toArray();
           return {
             images
           };
-        },
-        async aiHelperAccept(req) {
-          const id = self.apos.launder.id(req.body.id);
-          if (!id.length) {
+        }
+      },
+      delete: {
+        async 'ai-helper/:_id'(req) {
+          await self.aiHelperImages.removeOne({
+            _id: req.params._id,
+            userId: req.user._id
+          });
+          return {};
+        }
+      },
+      post: {
+        async 'ai-helper'(req) {
+          const prompt = self.apos.launder.string(req.body.prompt);
+          const variantOf = self.apos.launder.id(req.body.variantOf);
+          if (!prompt.length) {
             throw self.apos.error('invalid');
           }
-          const image = await self.apos.cache.get('aiHelperImage', id);
+          const body = variantOf ? new FormData() : {};
+          set('prompt', prompt);
+          set('n', 4);
+          set('size', '1024x1024');
+          let temp;
+          try {
+            if (variantOf) {
+              const existing = await self.aiHelperImages.findOne({
+                _id: variantOf
+              });
+              if (!existing) {
+                throw self.apos.error('notfound');
+              }
+              temp = await self.aiHelperFetchImage(existing._id, existing.url);
+              body('image', fs.createReadStream(temp));
+            }
+            const result = await self.apos.http.post('https://api.openai.com/v1/images/generations', {
+              headers: {
+                Authorization: `Bearer ${process.env.OPENAI_KEY}`
+              },
+              body
+            });
+            if (temp) {
+              fs.unlinkSync(temp);
+            }
+            if (!result.data) {
+              throw self.apos.error('error');
+            }
+            const urls = result.data.map(item => item.url);
+            const images = [];
+            const now = new Date();
+            for (const url of urls) {
+              const id = cuid();
+              const image = {
+                _id: id,
+                userId: req.user._id,
+                createdAt: now,
+                url,
+                prompt
+              };
+              await self.aiHelperImages.insertOne(image);
+              images.push(image);
+            }
+            return {
+              images
+            };
+          } finally {
+            if (temp) {
+              try {
+                await unlink(temp);
+              } catch (e) {
+                // Don't care if it never got there
+              }
+            }
+          }
+          function set(key, value) {
+            if (variantOf) {
+              body.append(key, value);
+            } else {
+              body[key] = value;
+            }
+          }
+        }
+      },
+      patch: {
+        async 'ai-helper/:_id'(req) {
+          const _id = req.params._id;
+          if (!req.body.accepted) {
+            // Currently the only property that can be PATCHed is "accepted"
+            throw self.apos.error('invalid');
+          }
+          if (!_id.length) {
+            throw self.apos.error('invalid');
+          }
+          const image = await self.aiHelperImages.findOne({ _id });
           if (!image) {
             throw self.apos.error('notfound');
           }
           const { url, prompt } = image;
           // apos.http has a bug with binary data, use node-fetch
-          const response = await fetch(url);
-          const buffer = await response.buffer();
-          const writeFile = require('util').promisify(require('fs').writeFile);
-          const temp = path.join(self.apos.rootDir, `data/temp/${id}.png`);
+          let temp;
           try {
-            await writeFile(temp, buffer);
+            temp = await self.aiHelperFetchImage(_id, url);
             const attachment = await self.apos.attachment.insert(req, {
               name: self.apos.util.slugify(prompt) + '.png',
               path: temp
@@ -92,12 +175,24 @@ module.exports = {
               attachment
             });
             self.apos.attachment.all(image, { annotate: true });
-            console.log('returning:', image);
-            return image;
+            const updated = {
+              ...image,
+              accepted: true,
+              imageId: image._id,
+              _image: image
+            };
+            await self.aiHelperImages.updateOne({ _id }, {
+              $set: {
+                accepted: true,
+                imageId: image._id
+              }
+            });
+            return updated;
           } finally {
-            const unlink = require('util').promisify(require('fs').unlink);
             try {
-              await unlink(temp);
+              if (temp) {
+                await unlink(temp);
+              }
             } catch (e) {
               // Don't care if it never got there
             }

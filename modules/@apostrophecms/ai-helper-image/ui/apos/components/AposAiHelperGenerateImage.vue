@@ -15,21 +15,39 @@
             <textarea v-model="prompt" :placeholder="$t('aposAiHelper:placeholderText')" />
             <AposButton
               :disabled="!prompt.length"
-              @click.prevent="generate"
+              @click.prevent="generate({})"
               :label="$t('aposAiHelper:generateImage')"
             />
             <p v-if="error">
               An error occurred.
             </p>
             <div class="apos-ai-helper-images">
-              <button
+              <div
                 v-for="image in images"
-                :key="image.id"
+                :key="image._id"
                 class="apos-ai-helper-image"
-                @click.prevent="save(image.id)"
+                :style="imageStyle(image)"
               >
-                <img :src="image.url">
-              </button>
+                <AposButton
+                  :disabled="image.accepted"
+                  @click.prevent="save(image)"
+                  icon="plus-icon"
+                  :icon-only="true"
+                  :label="$t('aposAiHelper:select')"
+                />
+                <AposButton
+                  @click.prevent="generate(image)"
+                  icon="group-icon"
+                  :icon-only="true"
+                  :label="$t('aposAiHelper:variations')"
+                />
+                <AposButton
+                  @click.prevent="remove(image)"
+                  :label="$t('aposAiHelper:delete')"
+                  icon="delete-icon"
+                  :icon-only="true"
+                />
+              </div>
             </div>
           </form>
         </template>
@@ -40,7 +58,7 @@
 
 <script>
 export default {
-  emits: [ 'modal-result' ],
+  emits: [ 'modal-result', 'safe-close' ],
   data() {
     return {
       modal: {
@@ -57,33 +75,44 @@ export default {
   },
   async mounted() {
     this.modal.active = true;
+    this.images = (await self.apos.http.get(`${apos.image.action}/ai-helper`, { busy: true })).images;
   },
   methods: {
     close() {
       this.modal.showModal = false;
     },
-    async generate() {
+    async generate({ variantOf }) {
       this.error = false;
-      this.images = [];
       try {
-        const result = await self.apos.http.post(`${apos.image.action}/ai-helper-generate`, {
+        const result = await self.apos.http.post(`${apos.image.action}/ai-helper`, {
           body: {
-            prompt: this.prompt
+            prompt: variantOf ? variantOf.prompt : this.prompt,
+            variantOf: variantOf._id
           },
           busy: true
         });
-        this.images = result.images;
+        this.images = [ ...result.images, this.images ];
+        this.$el.scrollTo(0, 0);
       } catch (e) {
+        console.error(e);
         this.error = true;
       }
     },
-    async save(id) {
+    imageStyle(image) {
+      return {
+        'background-image': `url(${image.url})`
+      };
+    },
+    async save({ _id }) {
       try {
-        const image = await self.apos.http.post(`${apos.image.action}/ai-helper-accept`, {
+        console.log(`id is ${_id}`);
+        const updated = await self.apos.http.patch(`${apos.image.action}/ai-helper/${_id}`, {
           body: {
-            id
-          }
+            accepted: 1
+          },
+          busy: true
         });
+        const image = updated._image;
         console.log('posting the content changed event after successful accept');
         this.$emit('modal-result', image);
         this.modal.showModal = false;
@@ -95,6 +124,12 @@ export default {
       } catch (e) {
         this.error = true;
       }
+    },
+    async remove({ _id }) {
+      this.images = this.images.filter(image => image._id !== _id);
+      await self.apos.http.delete(`${apos.image.action}/ai-helper/${_id}`, {
+        busy: true
+      });
     }
   }
 };
@@ -112,11 +147,9 @@ export default {
   gap: 16px;
 }
 .apos-ai-helper-image {
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+  aspect-ratio: 1;
+  background-size: cover;
+  display: flex;
 }
 textarea {
   height: 4em;

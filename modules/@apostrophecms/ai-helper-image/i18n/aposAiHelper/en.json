@@ -1,4 +1,7 @@
 {
   "generateImage": "Generate Image",
-  "placeholderText": "Describe the image you want to create."
+  "placeholderText": "Describe the image you want to create.",
+  "variations": "Variations",
+  "select": "Select",
+  "delete": "Delete"
 }
