@@ -36,7 +36,7 @@
                   :label="$t('aposAiHelper:select')"
                 />
                 <AposButton
-                  @click.prevent="generate(image)"
+                  @click.prevent="generate({ variantOf: image })"
                   icon="group-icon"
                   :icon-only="true"
                   :label="$t('aposAiHelper:variations')"
@@ -86,12 +86,13 @@ export default {
       try {
         const result = await self.apos.http.post(`${apos.image.action}/ai-helper`, {
           body: {
-            prompt: variantOf ? variantOf.prompt : this.prompt,
-            variantOf: variantOf._id
+            prompt: variantOf?.prompt || this.prompt,
+            variantOf: variantOf?._id
           },
           busy: true
         });
-        this.images = [ ...result.images, this.images ];
+        this.images = [ ...result.images, ...this.images ];
+        console.log(JSON.stringify(this.images, null, '  '));
         this.$el.scrollTo(0, 0);
       } catch (e) {
         console.error(e);

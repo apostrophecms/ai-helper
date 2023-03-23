@@ -84,7 +84,9 @@ module.exports = {
             throw self.apos.error('invalid');
           }
           const body = variantOf ? new FormData() : {};
-          set('prompt', prompt);
+          if (!variantOf) {
+            set('prompt', prompt);
+          }
           set('n', 4);
           set('size', '1024x1024');
           let temp;
@@ -97,9 +99,10 @@ module.exports = {
                 throw self.apos.error('notfound');
               }
               temp = await self.aiHelperFetchImage(existing._id, existing.url);
-              body('image', fs.createReadStream(temp));
+              body.append('image', fs.createReadStream(temp));
             }
-            const result = await self.apos.http.post('https://api.openai.com/v1/images/generations', {
+            const command = variantOf ? 'variations' : 'generations';
+            const result = await self.apos.http.post(`https://api.openai.com/v1/images/${command}`, {
               headers: {
                 Authorization: `Bearer ${process.env.OPENAI_KEY}`
               },
