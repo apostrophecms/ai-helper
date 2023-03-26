@@ -1,6 +1,6 @@
 <template>
   <AposModal
-    class="apos-ai-helper-generate-image"
+    class="apos-ai-helper-image-manager"
     :modal="modal"
     modal-title="aposAiHelper:generateImage"
     @inactive="modal.active = false"
@@ -22,32 +22,16 @@
               An error occurred.
             </p>
             <div class="apos-ai-helper-images">
-              <div
+              <button
                 v-for="image in images"
                 :key="image._id"
                 class="apos-ai-helper-image"
-                :style="imageStyle(image)"
+                @click.prevent="edit(image)"
               >
-                <AposButton
-                  :disabled="image.accepted"
-                  @click.prevent="save(image)"
-                  icon="plus-icon"
-                  :icon-only="true"
-                  :label="$t('aposAiHelper:select')"
-                />
-                <AposButton
-                  @click.prevent="generate({ variantOf: image })"
-                  icon="group-icon"
-                  :icon-only="true"
-                  :label="$t('aposAiHelper:variations')"
-                />
-                <AposButton
-                  @click.prevent="remove(image)"
-                  :label="$t('aposAiHelper:delete')"
-                  icon="delete-icon"
-                  :icon-only="true"
-                />
-              </div>
+                <img
+                  :src="image.url"
+                >
+              </button>
             </div>
           </form>
         </template>
@@ -81,6 +65,28 @@ export default {
     close() {
       this.modal.showModal = false;
     },
+    async edit(image) {
+      const result = await apos.modal.execute('AposAiHelperImageEditor', {
+        image
+      });
+      console.log('result is:', JSON.stringify(result));
+      const action = result.action;
+      console.log('action in manager is:', action);
+      // If I do this as !action: return I get a linter error 🤷‍♂️
+      if (action) {
+        if (action === 'save') {
+          await this.save(image);
+        } else if (action === 'variations') {
+          await this.generate({
+            variantOf: image
+        });
+        } else if (action === 'delete') {
+          await this.remove(image);
+        } else {
+          throw new Error(`Unimplemented action: ${action}`);
+        }
+      }
+    },
     async generate({ variantOf }) {
       this.error = false;
       try {
@@ -93,16 +99,11 @@ export default {
         });
         this.images = [ ...result.images, ...this.images ];
         console.log(JSON.stringify(this.images, null, '  '));
-        this.$el.scrollTo(0, 0);
+        this.$el.querySelector('[data-apos-modal-inner]').scrollTo(0, 0);
       } catch (e) {
         console.error(e);
         this.error = true;
       }
-    },
-    imageStyle(image) {
-      return {
-        'background-image': `url(${image.url})`
-      };
     },
     async save({ _id }) {
       try {
@@ -147,10 +148,11 @@ export default {
   grid-template-columns: auto auto;
   gap: 16px;
 }
-.apos-ai-helper-image {
+.apos-ai-helper-image img {
+  width: 100%;
+  height: 100%;
   aspect-ratio: 1;
-  background-size: cover;
-  display: flex;
+  object-fit: contain;
 }
 textarea {
   height: 4em;

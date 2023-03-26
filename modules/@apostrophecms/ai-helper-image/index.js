@@ -26,7 +26,7 @@ module.exports = {
         relationships: true,
         button: true,
         modalOptions: {
-          modal: 'AposAiHelperGenerateImage'
+          modal: 'AposAiHelperImageManager'
         }
       }
     }
@@ -90,6 +90,22 @@ module.exports = {
           set('n', 4);
           set('size', '1024x1024');
           let temp;
+          // Fake results for cheap & offline testing
+          if (process.env.APOS_AI_HELPER_MOCK) {
+            const now = new Date();
+            const images = [];
+            for (let i = 0; (i < 4); i++) {
+              images.push({
+                _id: cuid(),
+                userId: req.user._id,
+                createdAt: now,
+                url: self.apos.asset.url('/modules/@apostrophecms/ai-helper-image/placeholder.jpg')
+              });
+            }
+            return {
+              images
+            };
+          }
           try {
             if (variantOf) {
               const existing = await self.aiHelperImages.findOne({
