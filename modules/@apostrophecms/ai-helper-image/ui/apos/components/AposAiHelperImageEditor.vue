@@ -8,6 +8,12 @@
     @esc="close"
     @no-modal="$emit('safe-close')"
   >
+    <template #primaryControls>
+      <AposButton
+        type="default" label="apostrophe:close"
+        @click="close"
+      />
+    </template>
     <template #main>
       <AposModalBody>
         <template #bodyMain>
@@ -22,6 +28,7 @@
                 @click.prevent="action('save')"
                 icon="plus-icon"
                 :label="$t('aposAiHelper:select')"
+                type="primary"
               />
               <AposButton
                 @click.prevent="action('variations')"
@@ -30,8 +37,9 @@
               />
               <AposButton
                 @click.prevent="action('delete')"
+                icon="delete-icon"
                 :label="$t('aposAiHelper:delete')"
-                :icon-only="true"
+                type="danger"
               />
             </div>
             <p v-if="error">
@@ -63,15 +71,24 @@ export default {
       error: false
     };
   },
-  async mounted() {
+  mounted() {
     this.modal.active = true;
+    const expireMs = new Date(this.image.createdAt).getTime() + 1000 * 60 * 60;
+    const nowMs = Date.getTime();
+    const timeout = expireMs - nowMs;
+    this.expireTimeout = setTimeout(this.expire, Math.max(timeout, 0));
+  },
+  destroyed() {
+    clearTimeout(this.expireTimeout);
   },
   methods: {
+    expire() {
+      this.modal.showModal = false;
+    },
     close() {
       this.modal.showModal = false;
     },
     action(action) {
-      console.log('action is:', action);
       this.modal.showModal = false;
       this.$emit('modal-result', {
         action
@@ -82,6 +99,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+// Prevent scrollbar and ensure image shrinks to box rather than growing
+// in proportion to 100% width
 ::v-deep .apos-modal__main, ::v-deep .apos-modal__body-inner, ::v-deep .apos-modal__body-main {
   height: 100%;
   min-height: 0;
@@ -90,14 +109,16 @@ form {
   display: flex;
   flex-direction: column;
   height: 100%;
+  gap: 32px;
 }
 .apos-ai-helper-image {
   object-fit: contain;
   min-height: 0;
 }
-.apos-ai-helper-buttons {
+.apos-ai-helper-image-buttons {
   display: flex;
   flex-direction: row;
-  gap: 16px;
+  justify-content: center;
+  gap: 32px;
 }
 </style>

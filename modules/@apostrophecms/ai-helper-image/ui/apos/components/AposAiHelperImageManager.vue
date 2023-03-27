@@ -60,8 +60,18 @@ export default {
   async mounted() {
     this.modal.active = true;
     this.images = (await self.apos.http.get(`${apos.image.action}/ai-helper`, { busy: true })).images;
+    this.expireInterval = setInterval(this.expire, 1000 * 60);
+  },
+  destroyed() {
+    clearInterval(this.expireInterval);
   },
   methods: {
+    expire() {
+      const expired = new Date(Date.now() - 1000 * 60 * 60).toISOString();
+      if (this.images.some(image => image.createdAt <= expired)) {
+        this.images = this.images.filter(image => image.createdAt > expired);
+      }
+    },
     close() {
       this.modal.showModal = false;
     },
@@ -79,7 +89,7 @@ export default {
         } else if (action === 'variations') {
           await this.generate({
             variantOf: image
-        });
+          });
         } else if (action === 'delete') {
           await this.remove(image);
         } else {
