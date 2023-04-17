@@ -5,6 +5,10 @@ module.exports = {
   bundle: {
     directory: 'modules',
     modules: getBundleModuleNames()
+  },
+  options: {
+    textModel: 'text-davinci-003',
+    textMaxTokens: 1000
   }
 };
 

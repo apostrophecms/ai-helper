@@ -12,7 +12,7 @@
       <AposModalBody>
         <template #bodyMain>
           <form class="apos-ai-helper-form">
-            <textarea v-model="prompt" :placeholder="$t('aposAiHelper:placeholderText')" />
+            <textarea v-model="prompt" :placeholder="$t('aposAiHelper:imagePlaceholderText')" />
             <AposButton
               :disabled="!prompt.length"
               @click.prevent="generate({})"
