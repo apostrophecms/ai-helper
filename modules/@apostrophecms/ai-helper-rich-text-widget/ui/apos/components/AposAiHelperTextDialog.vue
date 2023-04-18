@@ -13,7 +13,10 @@
       menu-placement="bottom-start"
     >
       <form class="apos-ai-helper-form">
-        <textarea v-model="prompt" :placeholder="$t('aposAiHelper:textPlaceholderText')" />
+        <p>
+          {{ $t('aposAiHelper:textPromptLabel') }}
+        </p>
+        <textarea v-model="prompt" />
         <p v-if="error">
           An error occurred.
         </p>
@@ -126,8 +129,17 @@ function getOptions() {
     width: 500px;
   }
 
+  p {
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
   textarea {
     width: 100%;
+    line-height: 1.25;
+    padding: 4px;
+    height: 48px;
+    resize: none;
   }
 
   .apos-is-active {
