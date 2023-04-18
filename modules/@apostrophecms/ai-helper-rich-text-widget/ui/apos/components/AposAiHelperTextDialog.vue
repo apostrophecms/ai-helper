@@ -41,7 +41,7 @@
 <script>
 export default {
   name: 'AposAiHelperTextDialog',
-  emits: [ 'close', 'beforeCommands' ],
+  emits: [ 'close', 'before-commands' ],
   props: {
     editor: {
       type: Object,
@@ -87,7 +87,7 @@ export default {
           },
           busy: true
         });
-        this.$emit('beforeCommands');
+        this.$emit('before-commands');
         // newlines shouldn't matter but they do to tiptap, so get rid of them
         const html = result.html.replace(/>\n+</g, '><');
         this.editor.commands.insertContent(html);
