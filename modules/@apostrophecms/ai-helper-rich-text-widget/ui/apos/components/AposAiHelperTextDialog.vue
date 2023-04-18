@@ -47,6 +47,10 @@ export default {
     active: {
       type: Boolean,
       required: true
+    },
+    options: {
+      type: Object,
+      required: true
     }
   },
   data() {
@@ -73,15 +77,16 @@ export default {
     async save() {
       this.error = false;
       try {
+        const headingLevels = this.options.styles.filter(style => style.tag.match(/^h\d$/)).map(style => parseInt(style.tag.replace(/h/i, '')));
         const result = await self.apos.http.post(`${getOptions().action}/ai-helper`, {
           body: {
-            prompt: this.prompt
+            prompt: this.prompt,
+            headingLevels            
           },
           busy: true
         });
-        console.log(JSON.stringify(result, null, '  '));
         this.$emit('beforeCommands');
-        this.editor.commands.insertContent(result.text);
+        this.editor.commands.insertContent(result.html);
         this.close();
       } catch (e) {
         console.error(e);
