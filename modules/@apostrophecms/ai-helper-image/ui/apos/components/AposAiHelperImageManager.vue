@@ -79,9 +79,7 @@ export default {
       const result = await apos.modal.execute('AposAiHelperImageEditor', {
         image
       });
-      console.log('result is:', JSON.stringify(result));
       const action = result.action;
-      console.log('action in manager is:', action);
       // If I do this as !action: return I get a linter error 🤷‍♂️
       if (action) {
         if (action === 'save') {
@@ -108,7 +106,6 @@ export default {
           busy: true
         });
         this.images = [ ...result.images, ...this.images ];
-        console.log(JSON.stringify(this.images, null, '  '));
         this.$el.querySelector('[data-apos-modal-inner]').scrollTo(0, 0);
       } catch (e) {
         console.error(e);
@@ -117,7 +114,6 @@ export default {
     },
     async save({ _id }) {
       try {
-        console.log(`id is ${_id}`);
         const updated = await self.apos.http.patch(`${apos.image.action}/ai-helper/${_id}`, {
           body: {
             accepted: 1
@@ -125,7 +121,6 @@ export default {
           busy: true
         });
         const image = updated._image;
-        console.log('posting the content changed event after successful accept');
         this.$emit('modal-result', image);
         this.modal.showModal = false;
         apos.bus.$emit('content-changed', {

@@ -71,7 +71,6 @@ export default {
   },
   methods: {
     close() {
-      console.log('emitting close');
       this.$emit('close');
     },
     async save() {
@@ -86,7 +85,9 @@ export default {
           busy: true
         });
         this.$emit('beforeCommands');
-        this.editor.commands.insertContent(result.html);
+        // newlines shouldn't matter but they do to tiptap, so get rid of them
+        const html = result.html.replace(/>\n+</g, '><');
+        this.editor.commands.insertContent(html);
         this.close();
       } catch (e) {
         console.error(e);
