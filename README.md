@@ -53,6 +53,22 @@ someAreaName: {
 }
 ```
 
+
+```javascript
+// in modules/@apostrophecms/security-headers/index.js,
+// only if you are using that module in your project
+module.exports = {
+  options: {
+    policies: {
+      ai: {
+        // Images served by OpenAI, for editing purposes only
+        'img-src': '*.blob.core.windows.net'
+      }
+    }
+  }
+};
+```
+
 ## Run
 
 ```bash
