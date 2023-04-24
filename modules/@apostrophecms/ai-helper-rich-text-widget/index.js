@@ -55,13 +55,15 @@ module.exports = {
             max_tokens: aiHelper.options.textMaxTokens,
             n: 1
           };
-          const result = process.env.APOS_AI_HELPER_MOCK ? mockResults :
-            await self.apos.http.post(`https://api.openai.com/v1/completions`, {
-              headers: {
-                Authorization: `Bearer ${process.env.APOS_OPENAI_KEY}`
-              },
-              body
-            })
+          const result = process.env.APOS_AI_HELPER_MOCK
+            ? mockResults
+            :
+              await self.apos.http.post(`https://api.openai.com/v1/completions`, {
+                headers: {
+                  Authorization: `Bearer ${process.env.APOS_OPENAI_KEY}`
+                },
+                body
+              })
           ;
           if (!result?.choices?.[0]?.text) {
             throw self.apos.error('error');
