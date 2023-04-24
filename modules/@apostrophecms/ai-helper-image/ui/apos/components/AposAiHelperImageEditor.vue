@@ -17,7 +17,7 @@
     <template #main>
       <AposModalBody>
         <template #bodyMain>
-          <form>
+          <div class="apos-ai-helper-form">
             <img
               class="apos-ai-helper-image"
               :src="image.url"
@@ -45,7 +45,7 @@
             <p v-if="error">
               An error occurred.
             </p>
-          </form>
+          </div>
         </template>
       </AposModalBody>
     </template>
@@ -74,7 +74,7 @@ export default {
   mounted() {
     this.modal.active = true;
     const expireMs = new Date(this.image.createdAt).getTime() + 1000 * 60 * 60;
-    const nowMs = Date.getTime();
+    const nowMs = Date.now();
     const timeout = expireMs - nowMs;
     this.expireTimeout = setTimeout(this.expire, Math.max(timeout, 0));
   },
@@ -105,7 +105,7 @@ export default {
   height: 100%;
   min-height: 0;
 }
-form {
+.apos-ai-helper-form {
   display: flex;
   flex-direction: column;
   height: 100%;

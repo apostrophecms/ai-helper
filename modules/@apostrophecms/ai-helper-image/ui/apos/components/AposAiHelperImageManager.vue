@@ -79,7 +79,7 @@ export default {
       const result = await apos.modal.execute('AposAiHelperImageEditor', {
         image
       });
-      const action = result.action;
+      const action = result?.action;
       // If I do this as !action: return I get a linter error 🤷‍♂️
       if (action) {
         if (action === 'save') {

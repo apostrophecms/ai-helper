@@ -12,7 +12,7 @@
     <AposContextMenuDialog
       menu-placement="bottom-start"
     >
-      <form class="apos-ai-helper-form">
+      <div class="apos-ai-helper-form">
         <p>
           {{ $t('aposAiHelper:textPromptLabel') }}
         </p>
@@ -20,7 +20,7 @@
         <p v-if="error">
           An error occurred.
         </p>
-      </form>
+      </div>
       <footer class="apos-ai-helper-text__footer">
         <AposButton
           type="default" label="apostrophe:cancel"
