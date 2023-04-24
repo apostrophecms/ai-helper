@@ -72,7 +72,7 @@ module.exports = {
 ## Run
 
 ```bash
-export OPENAI_KEY=get-your-own-key-from-openai
+export APOS_OPENAI_KEY=get-your-own-key-from-openai
 node app
 ```
 

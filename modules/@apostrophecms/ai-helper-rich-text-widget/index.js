@@ -58,7 +58,7 @@ module.exports = {
           const result = process.env.APOS_AI_HELPER_MOCK ? mockResults :
             await self.apos.http.post(`https://api.openai.com/v1/completions`, {
               headers: {
-                Authorization: `Bearer ${process.env.OPENAI_KEY}`
+                Authorization: `Bearer ${process.env.APOS_OPENAI_KEY}`
               },
               body
             })

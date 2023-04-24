@@ -120,7 +120,7 @@ module.exports = {
             const command = variantOf ? 'variations' : 'generations';
             const result = await self.apos.http.post(`https://api.openai.com/v1/images/${command}`, {
               headers: {
-                Authorization: `Bearer ${process.env.OPENAI_KEY}`
+                Authorization: `Bearer ${process.env.APOS_OPENAI_KEY}`
               },
               body
             });
