@@ -1,4 +1,13 @@
 {
   "generateImage": "Generate Image",
-  "placeholderText": "Describe the image you want to create."
+  "generateTextLabel": "Generate Text",
+  "generateTextDescription": "Generate text with AI",
+  "imagePlaceholderText": "Describe the image you want to create.",
+  "textPromptLabel": "Enter a prompt to generate text. Example: \"100 words about cheese, in the style of Anthony Bourdain, with subheadings\"",
+  "variations": "Variations",
+  "select": "Select",
+  "delete": "Delete",
+  "generateTextAction": "Generate",
+  "rateLimitExceeded": "Rate limit exceeded, try again later",
+  "invalidRequest": "Invalid request, please review OpenAI's rules"
 }
