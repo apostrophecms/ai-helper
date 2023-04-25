@@ -148,6 +148,13 @@ module.exports = {
             return {
               images
             };
+          } catch (e) {
+            if (e.status === 429) {
+              self.apos.notify(req, 'aposAiHelper:rateLimitExceeded');
+            } else if (e.status === 400) {
+              self.apos.notify(req, 'aposAiHelper:invalidRequest');
+            }
+            throw e;
           } finally {
             if (temp) {
               try {

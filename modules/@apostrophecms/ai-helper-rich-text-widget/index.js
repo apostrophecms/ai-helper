@@ -38,51 +38,60 @@ module.exports = {
     return {
       post: {
         async aiHelper(req) {
-          const aiHelper = self.apos.modules['@apostrophecms/ai-helper'];
-          let prompt = self.apos.launder.string(req.body.prompt);
-          const headingLevels = self.apos.launder.strings(req.body.headingLevels).map(level => parseInt(level));
-          if (!prompt.length) {
-            throw self.apos.error('invalid');
-          }
-          prompt = `
-            Generate text in markdown format, based on the following prompt:
-            
-            ${prompt}
-          `;
-          const body = {
-            prompt,
-            model: aiHelper.options.textModel,
-            max_tokens: aiHelper.options.textMaxTokens,
-            n: 1
-          };
-          const result = process.env.APOS_AI_HELPER_MOCK
-            ? mockResults
-            :
-              await self.apos.http.post(`https://api.openai.com/v1/completions`, {
-                headers: {
-                  Authorization: `Bearer ${process.env.APOS_OPENAI_KEY}`
-                },
-                body
-              })
-          ;
-          if (!result?.choices?.[0]?.text) {
-            throw self.apos.error('error');
-          }
-          let markdown = result.choices[0].text;
-
-          // Remap headings to levels actually available in this widget
-          markdown = markdown.replace(/(^|\n)(#+) /g, (all, before, hashes) => {
-            if (!headingLevels.length) {
-              return '';
+          try {
+            const aiHelper = self.apos.modules['@apostrophecms/ai-helper'];
+            let prompt = self.apos.launder.string(req.body.prompt);
+            const headingLevels = self.apos.launder.strings(req.body.headingLevels).map(level => parseInt(level));
+            if (!prompt.length) {
+              throw self.apos.error('invalid');
             }
-            const level = headingLevels[hashes.length - 1];
-            return before + (level ? (before + '#'.repeat(level) + ' ') : '');
-          });
+            prompt = `
+              Generate text in markdown format, based on the following prompt:
+              
+              ${prompt}
+            `;
+            const body = {
+              prompt,
+              model: aiHelper.options.textModel,
+              max_tokens: aiHelper.options.textMaxTokens,
+              n: 1
+            };
+            const result = process.env.APOS_AI_HELPER_MOCK
+              ? mockResults
+              :
+                await self.apos.http.post(`https://api.openai.com/v1/completions`, {
+                  headers: {
+                    Authorization: `Bearer ${process.env.APOS_OPENAI_KEY}`
+                  },
+                  body
+                })
+            ;
+            if (!result?.choices?.[0]?.text) {
+              throw self.apos.error('error');
+            }
+            let markdown = result.choices[0].text;
 
-          const html = marked.parse(markdown);
-          return {
-            html
-          };
+            // Remap headings to levels actually available in this widget
+            markdown = markdown.replace(/(^|\n)(#+) /g, (all, before, hashes) => {
+              if (!headingLevels.length) {
+                return '';
+              }
+              const level = headingLevels[hashes.length - 1];
+              return before + (level ? (before + '#'.repeat(level) + ' ') : '');
+            });
+
+            const html = marked.parse(markdown);
+            return {
+              html
+            };
+          } catch (e) {
+            if (e.status === 429) {
+              self.apos.notify(req, 'aposAiHelper:rateLimitExceeded');
+            } else if (e.status === 400) {
+              self.apos.notify(req, 'aposAiHelper:invalidRequest');
+            }
+            throw e;
+          }
         }
       }
     };
