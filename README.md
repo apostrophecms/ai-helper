@@ -2,9 +2,13 @@
 
 ## Purpose
 
-This module enhances Apostrophe with AI-driven helpers. Currently this module offers a button to generate an image from a text prompt
-via OpenAI. You will need to [obtain your own API key from OpenAI](https://openai.com/product). As of this
-writing you can also [obtain a free API key for limited usage](https://platform.openai.com/account/api-keys).
+This module enhances Apostrophe with AI-driven helpers. Currently this module offers:
+
+* A button to generate an image from a text prompt via OpenAI.
+* An insert menu option to generate rich text from a prompt via OpenAI.
+
+You will need to [obtain your own API key from OpenAI](https://openai.com/product). As of this writing you can also
+[obtain a free API key for limited usage](https://platform.openai.com/account/api-keys).
 
 ## Caveats
 

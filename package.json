@@ -15,7 +15,7 @@
     "apostrophe"
   ],
   "author": "Apostrophe Technologies, Inc.",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/apostrophecms/ai-helper/issues"
   },
