@@ -3,7 +3,7 @@ const cuid = require('cuid');
 const path = require('path');
 const FormData = require('form-data');
 const fs = require('fs');
-const writeFile = require('util').promisify(fs.writeFile);
+const sharp = require('sharp');
 const unlink = require('util').promisify(require('fs').unlink);
 
 module.exports = {
@@ -43,8 +43,8 @@ module.exports = {
       async aiHelperFetchImage(_id, url) {
         const response = await fetch(url);
         const buffer = await response.buffer();
-        const temp = path.join(self.apos.rootDir, `data/temp/${_id}.png`);
-        await writeFile(temp, buffer);
+        const temp = path.join(self.apos.rootDir, `data/temp/${_id}.jpg`);
+        await sharp(buffer).toFile(temp);
         return temp;
       }
     };
