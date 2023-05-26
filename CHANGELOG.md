@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0-beta.2 (2023-05-11)
+## 1.0.0-beta.2 (2023-05-26)
 
 Convert imported PNGs to JPEGs as this is more appropriate to web
 delivery of AI-generated, often realistic images. Reduces image
