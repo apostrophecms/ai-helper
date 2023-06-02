@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="active"
-    v-click-outside-element="close"
+    v-click-outside-element="cancel"
     class="apos-popover apos-ai-helper-text__dialog"
     x-placement="bottom"
     :class="{
@@ -24,7 +24,7 @@
       <footer class="apos-ai-helper-text__footer">
         <AposButton
           type="default" label="apostrophe:cancel"
-          @click="close"
+          @click="cancel"
           :modifiers="formModifiers"
         />
         <AposButton
@@ -41,7 +41,7 @@
 <script>
 export default {
   name: 'AposAiHelperTextDialog',
-  emits: [ 'close', 'before-commands' ],
+  emits: [ 'cancel', 'done', 'before-commands' ],
   props: {
     editor: {
       type: Object,
@@ -73,8 +73,11 @@ export default {
     }
   },
   methods: {
-    close() {
-      this.$emit('close');
+    cancel() {
+      this.$emit('cancel');
+    },
+    done() {
+      this.$emit('done');
     },
     async save() {
       this.error = false;
@@ -83,7 +86,7 @@ export default {
         const result = await self.apos.http.post(`${getOptions().action}/ai-helper`, {
           body: {
             prompt: this.prompt,
-            headingLevels            
+            headingLevels
           },
           busy: true
         });
@@ -91,7 +94,7 @@ export default {
         // newlines shouldn't matter but they do to tiptap, so get rid of them
         const html = result.html.replace(/>\n+</g, '><');
         this.editor.commands.insertContent(html);
-        this.close();
+        this.done();
       } catch (e) {
         console.error(e);
         this.error = true;
@@ -99,7 +102,7 @@ export default {
     },
     keyboardHandler(e) {
       if (e.keyCode === 27) {
-        this.close();
+        this.cancel();
       }
     }
   }
