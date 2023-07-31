@@ -46,15 +46,15 @@ someAreaName: {
       styles: [
         {
           name: 'Heading',
-          element: 'h2'
+          tag: 'h2'
         },
         {
           name: 'Subheading',
-          element: 'h3'
+          tag: 'h3'
         },
         {
           name: 'Paragraph',
-          element: 'p'
+          tag: 'p'
         }
       ]
     }
