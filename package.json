@@ -1,6 +1,6 @@
 {
   "name": "@apostrophecms/ai-helper",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "description": "AI helpers for content creation",
   "main": "index.js",
   "scripts": {
