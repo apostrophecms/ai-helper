@@ -4,7 +4,9 @@ const path = require('path');
 const FormData = require('form-data');
 const fs = require('fs');
 const sharp = require('sharp');
-const unlink = require('util').promisify(require('fs').unlink);
+const util = require('util');
+const unlink = util.promisify(fs.unlink);
+const writeFile = util.promisify(fs.writeFile);
 
 module.exports = {
   improve: '@apostrophecms/image',
@@ -43,8 +45,8 @@ module.exports = {
       async aiHelperFetchImage(_id, url) {
         const response = await fetch(url);
         const buffer = await response.buffer();
-        const temp = path.join(self.apos.rootDir, `data/temp/${_id}.jpg`);
-        await sharp(buffer).toFile(temp);
+        const temp = path.join(self.apos.rootDir, `data/temp/${_id}.png`);
+        await writeFile(temp, buffer);
         return temp;
       }
     };
@@ -190,11 +192,14 @@ module.exports = {
           const { url, prompt } = image;
           // apos.http has a bug with binary data, use node-fetch
           let temp;
+          let tempJpg;
           try {
             temp = await self.aiHelperFetchImage(_id, url);
+            const tempJpg = temp.replace(/\.\w+$/, '') + '.jpg';
+            await sharp(temp).toFile(tempJpg);
             const attachment = await self.apos.attachment.insert(req, {
-              name: self.apos.util.slugify(prompt) + '.png',
-              path: temp
+              name: self.apos.util.slugify(prompt) + '.jpg',
+              path: tempJpg
             });
             const image = await self.apos.image.insert(req, {
               title: prompt,
@@ -219,8 +224,11 @@ module.exports = {
               if (temp) {
                 await unlink(temp);
               }
+              if (tempJpg) {
+                await unlink(tempJpg);
+              }
             } catch (e) {
-              // Don't care if it never got there
+              // We don't care if it never got there
             }
           }
         }
