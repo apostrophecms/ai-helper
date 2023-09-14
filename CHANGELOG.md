@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-beta.4 (2023-09-14)
+
+Just bumping the `latest` tag, no changes.
+
 ## 1.0.0-beta.3 (2023-08-03)
 
 Fixed a bug in the "variants" feature caused by premature PNG to JPEG
