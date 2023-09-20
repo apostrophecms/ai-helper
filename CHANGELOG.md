@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0-beta.5 (2023-09-20)
+
+* `text-davinci-003` model was deprecated, update to the `gpt-3.5-turbo-instruct` model as a new default
+* Document how to override the default text generation model and token limit (subject to GPT's own limits)
+
 ## 1.0.0-beta.4 (2023-09-14)
 
 Just bumping the `latest` tag, no changes.

@@ -13,7 +13,7 @@ module.exports = {
     modules: getBundleModuleNames()
   },
   options: {
-    textModel: 'text-davinci-003',
+    textModel: 'gpt-3.5-turbo-instruct',
     textMaxTokens: 1000
   }
 };

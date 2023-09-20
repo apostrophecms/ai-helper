@@ -25,7 +25,14 @@ npm install @apostrophecms/ai-helper
 ```javascript
 // in app.js
 modules: {
-  '@apostrophecms/ai-helper': {}
+  '@apostrophecms/ai-helper': {
+    // Optional: specify a particular GPT model name.
+    // This is the default:
+    textModel: 'gpt-3.5-turbo-instruct',
+    // Optional: override the maximum number of tokens,
+    // up to GPT's limit for the model. This is the default:
+    textMaxTokens: 1000
+  }
 }
 ```
 
