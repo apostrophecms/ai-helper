@@ -2,7 +2,7 @@
 
 ## UNRELEASED
 
-* Check that the current user `canEdit` images before showing the `Generate an image with AI` button.
+* Check that the current user `canCreate` images before showing the `Generate an image with AI` button.
 
 ## 1.0.0-beta.5 (2023-09-20)
 

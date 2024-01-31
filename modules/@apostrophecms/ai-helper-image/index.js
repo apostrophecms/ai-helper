@@ -30,7 +30,7 @@ module.exports = {
         modalOptions: {
           modal: 'AposAiHelperImageManager'
         },
-        canEdit: true
+        canCreate: true
       }
     }
   },
