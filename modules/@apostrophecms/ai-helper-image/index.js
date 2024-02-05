@@ -29,7 +29,8 @@ module.exports = {
         button: true,
         modalOptions: {
           modal: 'AposAiHelperImageManager'
-        }
+        },
+        canCreate: true
       }
     }
   },

@@ -1,5 +1,9 @@
 # Changelog
 
+## UNRELEASED
+
+* Check that the current user `canCreate` images before showing the `Generate an image with AI` button.
+
 ## 1.0.0-beta.5 (2023-09-20)
 
 * `text-davinci-003` model was deprecated, update to the `gpt-3.5-turbo-instruct` model as a new default
