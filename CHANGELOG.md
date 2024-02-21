@@ -1,6 +1,6 @@
 # Changelog
 
-## UNRELEASED
+## 1.0.0-beta.6 (2024-02-21)
 
 * Check that the current user `canCreate` images before showing the `Generate an image with AI` button.
 
