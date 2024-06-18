@@ -10,11 +10,6 @@ const writeFile = util.promisify(fs.writeFile);
 
 module.exports = {
   improve: '@apostrophecms/image',
-  i18n: {
-    aposAiHelper: {
-      browser: true
-    }
-  },
   icons: {
     'robot-icon': 'Robot',
     'group-icon': 'Group'
@@ -22,7 +17,7 @@ module.exports = {
   utilityOperations: {
     add: {
       aiInsertImage: {
-        label: 'Generate an image with AI',
+        label: 'aposAiHelper:utilityOperationLabel',
         icon: 'robot-icon',
         iconOnly: true,
         relationships: true,
