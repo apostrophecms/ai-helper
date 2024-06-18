@@ -18,7 +18,7 @@
         </p>
         <textarea v-model="prompt" />
         <p v-if="error">
-          An error occurred.
+          {{ $t('aposAiHelper:errorMessage') }}
         </p>
       </div>
       <footer class="apos-ai-helper-text__footer">

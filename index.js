@@ -8,6 +8,11 @@ module.exports = {
       throw new Error('APOS_OPENAI_KEY must be set in your environment');
     }
   },
+  i18n: {
+    aposAiHelper: {
+      browser: true
+    }
+  },
   bundle: {
     directory: 'modules',
     modules: getBundleModuleNames()
