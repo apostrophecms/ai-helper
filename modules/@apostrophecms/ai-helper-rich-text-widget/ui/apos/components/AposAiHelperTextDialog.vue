@@ -82,7 +82,7 @@ export default {
     async save() {
       this.error = false;
       try {
-        const headingLevels = this.options.styles.filter(style => style.tag.match(/^h\d$/)).map(style => parseInt(style.tag.replace(/h/i, '')));
+        const headingLevels = (this.options.styles || []).filter(style => style.tag.match(/^h\d$/)).map(style => parseInt(style.tag.replace(/h/i, '')));
         const result = await self.apos.http.post(`${getOptions().action}/ai-helper`, {
           body: {
             prompt: this.prompt,
@@ -96,7 +96,6 @@ export default {
         this.editor.commands.insertContent(html);
         this.done();
       } catch (e) {
-        console.error(e);
         this.error = true;
       }
     },

@@ -28,7 +28,12 @@ modules: {
   '@apostrophecms/ai-helper': {
     // Optional: specify a particular GPT model name.
     // This is the default:
-    textModel: 'gpt-3.5-turbo-instruct',
+    textModel: 'gpt-4o',
+    // Optional: specify a particular Dall-E image
+    // generation model name. This is the default.
+    // Note: dall-e-3 currently lacks features needed
+    // by this module
+    imageModel: 'dall-e-2',
     // Optional: override the maximum number of tokens,
     // up to GPT's limit for the model. This is the default:
     textMaxTokens: 1000

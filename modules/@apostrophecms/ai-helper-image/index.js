@@ -76,6 +76,8 @@ module.exports = {
       },
       post: {
         async 'ai-helper'(req) {
+          const aiHelper = self.apos.modules['@apostrophecms/ai-helper'];
+          aiHelper.checkPermissions(req);
           const prompt = self.apos.launder.string(req.body.prompt);
           const variantOf = self.apos.launder.id(req.body.variantOf);
           if (!prompt.length) {
@@ -87,6 +89,7 @@ module.exports = {
           }
           set('n', 4);
           set('size', '1024x1024');
+          set('model', aiHelper.options.imageModel);
           let temp;
           // Fake results for cheap & offline testing
           if (process.env.APOS_AI_HELPER_MOCK) {
