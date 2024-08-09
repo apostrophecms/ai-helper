@@ -18,8 +18,21 @@ module.exports = {
     modules: getBundleModuleNames()
   },
   options: {
-    textModel: 'gpt-3.5-turbo-instruct',
-    textMaxTokens: 1000
+    textModel: 'gpt-4o',
+    textMaxTokens: 1000,
+    // Note: dall-e-3 does not support variations
+    imageModel: 'dall-e-2'
+  },
+  methods(self) {
+    return {
+      checkPermissions(req) {
+        // If the user cannot edit at least one content type, they have
+        // no business talking to the AI
+        if (!Object.keys(self.apos.modules).some(type => self.apos.permission.can(req, 'edit', type))) {
+          throw self.apos.error('forbidden');
+        }
+      }
+    }
   }
 };
 

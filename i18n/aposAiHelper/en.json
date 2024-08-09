@@ -3,7 +3,7 @@
   "generateTextLabel": "Generate Text",
   "generateTextDescription": "Generate text with AI",
   "imagePlaceholderText": "Describe the image you want to create.",
-  "textPromptLabel": "Enter a prompt to generate text. Example: \"100 words about cheese, in the style of Anthony Bourdain, with subheadings\"",
+  "textPromptLabel": "Enter a prompt to generate text. Example: \"100 words about cheese, with subheadings\"",
   "variations": "Variations",
   "select": "Select",
   "delete": "Delete",

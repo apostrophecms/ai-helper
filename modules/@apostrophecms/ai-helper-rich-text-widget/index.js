@@ -40,38 +40,45 @@ module.exports = {
         async aiHelper(req) {
           try {
             const aiHelper = self.apos.modules['@apostrophecms/ai-helper'];
+            aiHelper.checkPermissions(req);
             let prompt = self.apos.launder.string(req.body.prompt);
             const headingLevels = self.apos.launder.strings(req.body.headingLevels).map(level => parseInt(level));
             if (!prompt.length) {
               throw self.apos.error('invalid');
             }
-            prompt = `
-              Generate text in markdown format, based on the following prompt:
-              
-              ${prompt}
-            `;
             const body = {
-              prompt,
+              messages: [
+                {
+                  role: 'system',
+                  content: 'You are a helpful text-generation assistant for CMS content. You generate text in Markdown format based on the given prompt.'
+                },
+                {
+                  role: 'user',
+                  content: prompt
+                }
+              ],
               model: aiHelper.options.textModel,
-              max_tokens: aiHelper.options.textMaxTokens,
-              n: 1
+              max_tokens: aiHelper.options.textMaxTokens
             };
+            const post = (...args) => {
+              console.log('args:', args);
+              return self.apos.http.post(...args);
+            }
             const result = process.env.APOS_AI_HELPER_MOCK
               ? mockResults
-              : await self.apos.http.post('https://api.openai.com/v1/completions', {
+              : await post('https://api.openai.com/v1/chat/completions', {
                 headers: {
                   Authorization: `Bearer ${process.env.APOS_OPENAI_KEY}`
                 },
                 body
               })
             ;
-            if (!result?.choices?.[0]?.text) {
+            const content = result?.choices?.[0]?.message?.content;
+            if (!content) {
               throw self.apos.error('error');
             }
-            let markdown = result.choices[0].text;
-
             // Remap headings to levels actually available in this widget
-            markdown = markdown.replace(/(^|\n)(#+) /g, (all, before, hashes) => {
+            markdown = content.replace(/(^|\n)(#+) /g, (all, before, hashes) => {
               if (!headingLevels.length) {
                 return '';
               }
@@ -84,6 +91,7 @@ module.exports = {
               html
             };
           } catch (e) {
+            console.error(e);
             if (e.status === 429) {
               self.apos.notify(req, 'aposAiHelper:rateLimitExceeded');
             } else if (e.status === 400) {

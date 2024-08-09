@@ -108,7 +108,6 @@ export default {
         this.images = [ ...result.images, ...this.images ];
         this.$el.querySelector('[data-apos-modal-inner]').scrollTo(0, 0);
       } catch (e) {
-        console.error(e);
         this.error = true;
       }
     },
