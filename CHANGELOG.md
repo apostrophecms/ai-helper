@@ -1,6 +1,6 @@
 # Changelog
 
-## UNRELEASED
+## 1.0.0-beta.9 (2024-09-05)
 
 * Add AI and community-reviewed translation strings
 
