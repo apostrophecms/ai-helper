@@ -1,5 +1,9 @@
 # Changelog
 
+## UNRELEASED
+
+* Add AI and community-reviewed translation strings
+
 ## 1.0.0-beta.8 (2024-08-09)
 
 * Security: Apostrophe now checks to make sure the current user can edit at least one type of content on the site before making calls to the OpenAI APIs. Upgrading is recommended.
