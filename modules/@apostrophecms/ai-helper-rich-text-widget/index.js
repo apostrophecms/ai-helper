@@ -41,8 +41,10 @@ module.exports = {
           try {
             const aiHelper = self.apos.modules['@apostrophecms/ai-helper'];
             aiHelper.checkPermissions(req);
-            let prompt = self.apos.launder.string(req.body.prompt);
-            const headingLevels = self.apos.launder.strings(req.body.headingLevels).map(level => parseInt(level));
+            const prompt = self.apos.launder.string(req.body.prompt);
+            const headingLevels = self.apos.launder
+              .strings(req.body.headingLevels)
+              .map(level => parseInt(level));
             if (!prompt.length) {
               throw self.apos.error('invalid');
             }
@@ -63,7 +65,7 @@ module.exports = {
             const post = (...args) => {
               console.log('args:', args);
               return self.apos.http.post(...args);
-            }
+            };
             const result = process.env.APOS_AI_HELPER_MOCK
               ? mockResults
               : await post('https://api.openai.com/v1/chat/completions', {
@@ -78,7 +80,7 @@ module.exports = {
               throw self.apos.error('error');
             }
             // Remap headings to levels actually available in this widget
-            markdown = content.replace(/(^|\n)(#+) /g, (all, before, hashes) => {
+            const markdown = content.replace(/(^|\n)(#+) /g, (all, before, hashes) => {
               if (!headingLevels.length) {
                 return '';
               }

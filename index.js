@@ -32,7 +32,7 @@ module.exports = {
           throw self.apos.error('forbidden');
         }
       }
-    }
+    };
   }
 };
 
