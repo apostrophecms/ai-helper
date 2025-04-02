@@ -12,11 +12,14 @@
       <AposModalBody>
         <template #bodyMain>
           <form class="apos-ai-helper-form">
-            <textarea v-model="prompt" :placeholder="$t('aposAiHelper:imagePlaceholderText')" />
+            <textarea
+              v-model="prompt"
+              :placeholder="$t('aposAiHelper:imagePlaceholderText')"
+            />
             <AposButton
               :disabled="!prompt.length"
-              @click.prevent="generate({})"
               :label="$t('aposAiHelper:generateImage')"
+              @click.prevent="generate({})"
             />
             <p v-if="error">
               An error occurred.
@@ -59,10 +62,12 @@ export default {
   },
   async mounted() {
     this.modal.active = true;
-    this.images = (await self.apos.http.get(`${apos.image.action}/ai-helper`, { busy: true })).images;
+    // TODO: Error handling
+    this.images = (await apos.http.get(`${apos.image.action}/ai-helper`, { busy: true }))
+      .images;
     this.expireInterval = setInterval(this.expire, 1000 * 60);
   },
-  destroyed() {
+  unmounted() {
     clearInterval(this.expireInterval);
   },
   methods: {
@@ -98,7 +103,7 @@ export default {
     async generate({ variantOf }) {
       this.error = false;
       try {
-        const result = await self.apos.http.post(`${apos.image.action}/ai-helper`, {
+        const result = await apos.http.post(`${apos.image.action}/ai-helper`, {
           body: {
             prompt: variantOf?.prompt || this.prompt,
             variantOf: variantOf?._id
@@ -113,7 +118,7 @@ export default {
     },
     async save({ _id }) {
       try {
-        const updated = await self.apos.http.patch(`${apos.image.action}/ai-helper/${_id}`, {
+        const updated = await apos.http.patch(`${apos.image.action}/ai-helper/${_id}`, {
           body: {
             accepted: 1
           },
@@ -133,7 +138,7 @@ export default {
     },
     async remove({ _id }) {
       this.images = this.images.filter(image => image._id !== _id);
-      await self.apos.http.delete(`${apos.image.action}/ai-helper/${_id}`, {
+      await apos.http.delete(`${apos.image.action}/ai-helper/${_id}`, {
         busy: true
       });
     }

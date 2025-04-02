@@ -1,5 +1,11 @@
 # Changelog
 
+## UNRELEASED
+
+### Changes
+
+* Bumbs `eslint-config-apostrophe` to `5`, fixes errors, removes unused dependencies.
+
 ## 1.0.0-beta.9 (2024-09-05)
 
 * Add AI and community-reviewed translation strings

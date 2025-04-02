@@ -10,7 +10,8 @@
   >
     <template #primaryControls>
       <AposButton
-        type="default" label="apostrophe:close"
+        type="default"
+        label="apostrophe:close"
         @click="close"
       />
     </template>
@@ -25,21 +26,21 @@
             <div class="apos-ai-helper-image-buttons">
               <AposButton
                 :disabled="image.accepted"
-                @click.prevent="action('save')"
                 icon="plus-icon"
                 :label="$t('aposAiHelper:select')"
                 type="primary"
+                @click.prevent="action('save')"
               />
               <AposButton
-                @click.prevent="action('variations')"
                 icon="group-icon"
                 :label="$t('aposAiHelper:variations')"
+                @click.prevent="action('variations')"
               />
               <AposButton
-                @click.prevent="action('delete')"
                 icon="delete-icon"
                 :label="$t('aposAiHelper:delete')"
                 type="danger"
+                @click.prevent="action('delete')"
               />
             </div>
             <p v-if="error">
@@ -78,7 +79,7 @@ export default {
     const timeout = expireMs - nowMs;
     this.expireTimeout = setTimeout(this.expire, Math.max(timeout, 0));
   },
-  destroyed() {
+  unmounted() {
     clearTimeout(this.expireTimeout);
   },
   methods: {
@@ -101,7 +102,7 @@ export default {
 <style lang="scss" scoped>
 // Prevent scrollbar and ensure image shrinks to box rather than growing
 // in proportion to 100% width
-::v-deep .apos-modal__main, ::v-deep .apos-modal__body-inner, ::v-deep .apos-modal__body-main {
+:deep(apos-modal__main), :deep(.apos-modal__body-inner), :deep(.apos-modal__body-main) {
   height: 100%;
   min-height: 0;
 }

@@ -23,15 +23,17 @@
       </div>
       <footer class="apos-ai-helper-text__footer">
         <AposButton
-          type="default" label="apostrophe:cancel"
-          @click="cancel"
+          type="default"
+          label="apostrophe:cancel"
           :modifiers="formModifiers"
+          @click="cancel"
         />
         <AposButton
-          type="primary" label="aposAiHelper:generateTextAction"
-          @click="save"
+          type="primary"
+          label="aposAiHelper:generateTextAction"
           :disabled="!prompt.length"
           :modifiers="formModifiers"
+          @click="save"
         />
       </footer>
     </AposContextMenuDialog>
@@ -41,7 +43,6 @@
 <script>
 export default {
   name: 'AposAiHelperTextDialog',
-  emits: [ 'cancel', 'done', 'before-commands' ],
   props: {
     editor: {
       type: Object,
@@ -56,6 +57,7 @@ export default {
       required: true
     }
   },
+  emits: [ 'cancel', 'done', 'before-commands' ],
   data() {
     return {
       prompt: '',
@@ -83,7 +85,7 @@ export default {
       this.error = false;
       try {
         const headingLevels = (this.options.styles || []).filter(style => style.tag.match(/^h\d$/)).map(style => parseInt(style.tag.replace(/h/i, '')));
-        const result = await self.apos.http.post(`${getOptions().action}/ai-helper`, {
+        const result = await apos.http.post(`${getOptions().action}/ai-helper`, {
           body: {
             prompt: this.prompt,
             headingLevels
