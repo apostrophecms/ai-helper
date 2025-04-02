@@ -22,10 +22,7 @@
   },
   "homepage": "https://github.com/apostrophecms/ai-helper#readme",
   "devDependencies": {
-    "eslint": "^8.57.1",
-    "eslint-config-apostrophe": "github:apostrophecms/eslint-config-apostrophe",
-    "eslint-plugin-vue": "^10.0.0",
-    "vue-eslint-parser": "^10.1.1"
+    "eslint-config-apostrophe": "^5.0.0"
   },
   "dependencies": {
     "cuid": "^3.0.0",
