@@ -21,7 +21,7 @@ module.exports = {
     textModel: 'gpt-4o',
     textMaxTokens: 1000,
     // Note: dall-e-3 does not support variations
-    imageModel: 'dall-e-2'
+    imageModel: 'gpt-image-1'
   },
   methods(self) {
     return {

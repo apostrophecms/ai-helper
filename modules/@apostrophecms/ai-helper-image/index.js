@@ -38,12 +38,43 @@ module.exports = {
   },
   methods(self) {
     return {
+      // Legacy method for models that return URLs, not base64
       async aiHelperFetchImage(_id, url) {
         const response = await fetch(url);
         const buffer = await response.buffer();
         const temp = path.join(self.apos.rootDir, `data/temp/${_id}.png`);
         await writeFile(temp, buffer);
         return temp;
+      },
+      // Write a base64 image to uploadfs
+      async aiHelperWriteImageToUploadfs(_id, base64) {
+        const temp = path.join(self.apos.rootDir, `data/temp/${_id}.png`);
+        await writeFile(temp, Buffer.from(base64, 'base64'));
+        await util.promisify(self.uplaodfs.copyIn)(`/ai-image/${_id}.png`, temp);
+        await fs.removeFileSync(temp);
+        return 
+      },
+      async aiHelperRemoveImage(req, _id) {
+        const aiImage = await self.aiHelperImages.findOne({
+          _id: req.params._id,
+          userId: req.user._id
+        });
+        if (!aiImage) {
+          throw self.apos.error('notfound');
+        }
+        if (!aiImage.url) {
+          // Newer image, received as base64, now in uploadfs waiting to be removed
+          try {
+            await util.promisify(self.uploadfs.remove)(`/ai-images/${req.params_id}.png`);
+          } catch (e) {
+            // Probably already deleted
+            console.warn(e);
+          }
+        }
+        await self.aiHelperImages.deleteOne({
+          _id: req.params._id,
+          userId: req.user._id
+        });
       }
     };
   },
@@ -54,7 +85,9 @@ module.exports = {
           const images = await self.aiHelperImages.find({
             userId: req.user._id,
             createdAt: {
-              // OpenAI image URLs are only good for an hour
+              // OpenAI image URLs were originally only good for an hour, and
+              // it's not a bad policy: the ones you don't use are
+              // kept for an hour
               $gte: new Date(Date.now() - 1000 * 60 * 60)
             }
           }).sort({
@@ -67,10 +100,7 @@ module.exports = {
       },
       delete: {
         async 'ai-helper/:_id'(req) {
-          await self.aiHelperImages.removeOne({
-            _id: req.params._id,
-            userId: req.user._id
-          });
+          await self.removeAiHelperImage(req, req.params._id);
           return {};
         }
       },
@@ -80,7 +110,7 @@ module.exports = {
           aiHelper.checkPermissions(req);
           const prompt = self.apos.launder.string(req.body.prompt);
           const variantOf = self.apos.launder.id(req.body.variantOf);
-          if (!prompt.length) {
+          if (!prompt.length) { 
             throw self.apos.error('invalid');
           }
           const body = variantOf ? new FormData() : {};
@@ -131,18 +161,20 @@ module.exports = {
             if (!result.data) {
               throw self.apos.error('error');
             }
-            const urls = result.data.map(item => item.url);
             const images = [];
             const now = new Date();
-            for (const url of urls) {
+            for (const item of result.data.items) {
               const id = cuid();
               const image = {
                 _id: id,
                 userId: req.user._id,
                 createdAt: now,
-                url,
+                uploadfs: !!item.b64_json,
                 prompt
               };
+              if (item.b64_json) {
+                image.url = await self.aiHelperWriteImageToUploadfs(id, item.b64_json);
+              }
               await self.aiHelperImages.insertOne(image);
               images.push(image);
             }
@@ -154,6 +186,8 @@ module.exports = {
               self.apos.notify(req, 'aposAiHelper:rateLimitExceeded');
             } else if (e.status === 400) {
               self.apos.notify(req, 'aposAiHelper:invalidRequest');
+            } else {
+              console.error(e);
             }
             throw e;
           } finally {
