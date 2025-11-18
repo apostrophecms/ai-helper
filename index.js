@@ -18,10 +18,9 @@ module.exports = {
     modules: getBundleModuleNames()
   },
   options: {
-    textModel: 'gpt-4o',
+    textModel: 'gpt-5.1',
     textMaxTokens: 1000,
-    // Note: dall-e-3 does not support variations
-    imageModel: 'gpt-image-1'
+    imageModel: 'gpt-image-1-mini'
   },
   methods(self) {
     return {

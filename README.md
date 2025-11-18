@@ -7,8 +7,8 @@ This module enhances Apostrophe with AI-driven helpers. Currently this module of
 * A button to generate an image from a text prompt via OpenAI.
 * An insert menu option to generate rich text from a prompt via OpenAI.
 
-You will need to [obtain your own API key from OpenAI](https://openai.com/product). As of this writing you can also
-[obtain a free API key for limited usage](https://platform.openai.com/account/api-keys).
+You will need to [obtain your own API key from OpenAI](https://openai.com/api/). To generate images using the default
+model you will need to verify your organization in your OpenAI account.
 
 ## Caveats
 
@@ -28,12 +28,10 @@ modules: {
   '@apostrophecms/ai-helper': {
     // Optional: specify a particular GPT model name.
     // This is the default:
-    textModel: 'gpt-4o',
-    // Optional: specify a particular Dall-E image
-    // generation model name. This is the default.
-    // Note: dall-e-3 currently lacks features needed
-    // by this module
-    imageModel: 'dall-e-2',
+    textModel: 'gpt-5.1',
+    // Optional: specify a particular image generation model.
+    // This is the default:
+    imageModel: 'gpt-image-1-mini',
     // Optional: override the maximum number of tokens,
     // up to GPT's limit for the model. This is the default:
     textMaxTokens: 1000

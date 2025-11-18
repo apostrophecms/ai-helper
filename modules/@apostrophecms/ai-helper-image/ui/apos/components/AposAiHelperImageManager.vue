@@ -53,7 +53,7 @@ export default {
         type: 'slide',
         origin: 'right',
         showModal: false,
-        width: 'full'
+        width: 'two-thirds'
       },
       error: false,
       prompt: '',
@@ -154,7 +154,7 @@ export default {
 }
 .apos-ai-helper-images {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 .apos-ai-helper-image img {
