@@ -34,6 +34,13 @@ module.exports = {
       }
     };
   },
+  init(self) {
+    const defaultOptions = self.options.defaultOptions;
+    defaultOptions.insert ||= [];
+    if (!defaultOptions.insert.includes('ai')) {
+      defaultOptions.insert.push('ai');
+    }
+  },
   apiRoutes(self) {
     return {
       post: {
@@ -52,7 +59,7 @@ module.exports = {
               messages: [
                 {
                   role: 'system',
-                  content: 'You are a helpful text-generation assistant for CMS content. You generate text in Markdown format based on the given prompt.'
+                  content: 'You are a helpful text-generation assistant for CMS content. You generate text in Markdown format based on the given prompt. If the response is more than two paragraphs, use markdown subheadings.'
                 },
                 {
                   role: 'user',
@@ -60,11 +67,11 @@ module.exports = {
                 }
               ],
               model: aiHelper.options.textModel,
-              max_tokens: aiHelper.options.textMaxTokens
+              max_completion_tokens: aiHelper.options.textMaxTokens
             };
-            const post = (...args) => {
-              console.log('args:', args);
-              return self.apos.http.post(...args);
+            async function post(...args) {
+              const response = await self.apos.http.post(...args);
+              return response;
             };
             const result = process.env.APOS_AI_HELPER_MOCK
               ? mockResults
@@ -93,7 +100,7 @@ module.exports = {
               html
             };
           } catch (e) {
-            console.error(e);
+            self.apos.util.warn(e);
             if (e.status === 429) {
               self.apos.notify(req, 'aposAiHelper:rateLimitExceeded');
             } else if (e.status === 400) {

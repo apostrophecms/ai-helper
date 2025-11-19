@@ -1,10 +1,12 @@
 # Changelog
 
-## UNRELEASED
+## 1.0.0-beta.10 (2025-11-18)
 
-### Changes
-
-* Bumbs `eslint-config-apostrophe` to `5`, fixes errors, removes unused dependencies.
+* Text generation is fully compatible with the latest versions of Apostrophe 4.x.
+* Default models modernized to `gpt-5.1` and `gpt-image-1-mini`.
+* Compatible with current OpenAI API.
+* Because newer models take much longer to generate each image and also generate much better images, the image generator now generates one image or variant image at a time.
+* Bumps `eslint-config-apostrophe` to `5`, fixes linter errors, removes unused dependencies and modernizes dependencies.
 
 ## 1.0.0-beta.9 (2024-09-05)
 

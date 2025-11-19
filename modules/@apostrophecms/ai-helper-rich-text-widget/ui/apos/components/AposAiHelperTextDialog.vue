@@ -1,42 +1,36 @@
 <template>
   <div
-    v-if="active"
-    v-click-outside-element="cancel"
     class="apos-popover apos-ai-helper-text__dialog"
     x-placement="bottom"
     :class="{
-      'apos-is-triggered': active,
+      'apos-is-triggered': true,
       'apos-has-selection': true
     }"
   >
-    <AposContextMenuDialog
-      menu-placement="bottom-start"
-    >
-      <div class="apos-ai-helper-form">
-        <p>
-          {{ $t('aposAiHelper:textPromptLabel') }}
-        </p>
-        <textarea v-model="prompt" />
-        <p v-if="error">
-          {{ $t('aposAiHelper:errorMessage') }}
-        </p>
-      </div>
-      <footer class="apos-ai-helper-text__footer">
-        <AposButton
-          type="default"
-          label="apostrophe:cancel"
-          :modifiers="formModifiers"
-          @click="cancel"
-        />
-        <AposButton
-          type="primary"
-          label="aposAiHelper:generateTextAction"
-          :disabled="!prompt.length"
-          :modifiers="formModifiers"
-          @click="save"
-        />
-      </footer>
-    </AposContextMenuDialog>
+    <div class="apos-ai-helper-form">
+      <p>
+        {{ $t('aposAiHelper:textPromptLabel') }}
+      </p>
+      <textarea v-model="prompt" />
+      <p v-if="error">
+        {{ $t('aposAiHelper:errorMessage') }}
+      </p>
+    </div>
+    <footer class="apos-ai-helper-text__footer">
+      <AposButton
+        type="default"
+        label="apostrophe:cancel"
+        :modifiers="formModifiers"
+        @click="cancel"
+      />
+      <AposButton
+        type="primary"
+        label="aposAiHelper:generateTextAction"
+        :disabled="!prompt.length"
+        :modifiers="formModifiers"
+        @click="save"
+      />
+    </footer>
   </div>
 </template>
 
@@ -48,16 +42,12 @@ export default {
       type: Object,
       required: true
     },
-    active: {
-      type: Boolean,
-      required: true
-    },
     options: {
       type: Object,
       required: true
     }
   },
-  emits: [ 'cancel', 'done', 'before-commands' ],
+  emits: [ 'close', 'before-commands' ],
   data() {
     return {
       prompt: '',
@@ -65,21 +55,18 @@ export default {
       formModifiers: [ 'small', 'margin-micro' ]
     };
   },
-  watch: {
-    active(newVal) {
-      if (newVal) {
-        window.addEventListener('keydown', this.keyboardHandler);
-      } else {
-        window.removeEventListener('keydown', this.keyboardHandler);
-      }
-    }
+  mounted() {
+    window.addEventListener('keydown', this.keyboardHandler);
+  },
+  unmounted() {
+    window.removeEventListener('keydown', this.keyboardHandler);
   },
   methods: {
     cancel() {
-      this.$emit('cancel');
+      this.$emit('close');
     },
     done() {
-      this.$emit('done');
+      this.$emit('close');
     },
     async save() {
       this.error = false;
@@ -116,12 +103,7 @@ function getOptions() {
 
 <style lang="scss" scoped>
   .apos-ai-helper-text__dialog {
-    z-index: $z-index-modal;
-    position: absolute;
-    top: calc(100% + 5px);
-    left: -15px;
-    opacity: 0;
-    pointer-events: none;
+    width: 500px;
   }
 
   .apos-ai-helper-text__dialog.apos-is-triggered {
@@ -144,10 +126,6 @@ function getOptions() {
     padding: 4px;
     height: 48px;
     resize: none;
-  }
-
-  .apos-is-active {
-    background-color: var(--a-base-7);
   }
 
   .apos-ai-helper-text__footer {
